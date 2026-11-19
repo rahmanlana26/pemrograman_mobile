@@ -26,36 +26,51 @@ class _MediaSelectorState extends State<MediaSelector> {
   // pengguna
 
   Widget _mediaPlaceholder() {
-    Icon icon;
+    IconData iconData;
     String caption = '';
     Widget placeholderWidget;
     // Cek jenis medianya apakah foto atau video
     if (widget.mediaType == MediaType.photo) {
-      icon = Icon(Icons.image_not_supported, color: Colors.grey);
-      caption = 'No photo';
+      iconData = Icons.image_not_supported_outlined;
+      caption = 'Belum ada foto';
       placeholderWidget = Image.file(
         File(_mediaPath),
         width: double.infinity, // <-- Isi penuh parent
         fit: BoxFit.fitWidth, // <-- Tinggi otomatis sesuai rasio
       );
     } else {
-      icon = Icon(Icons.videocam_off, color: Colors.grey);
-      caption = 'No video';
+      iconData = Icons.videocam_off_outlined;
+      caption = 'Belum ada video';
       placeholderWidget = VideoPreview(path: _mediaPath); // <-- Di sini,
       // `Column()` Kita ganti dengan widget yang kita buat tadi.
     }
     // Jika path kosong, tampilkan "No Photo/Video".
     if (_mediaPath.isEmpty) {
+      final ColorScheme colorScheme = Theme.of(context).colorScheme;
       return SizedBox(
-        height: 56, // <-- Tinggi default TextField
-        child: Row(
-          children: [icon, SizedBox(width: 8), Text(caption)],
+        height: 120,
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(iconData, size: 32, color: colorScheme.onSurfaceVariant),
+            const SizedBox(height: 8),
+            Text(
+              caption,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
         ),
       );
     }
     // Jika path ada isinya, tampilkan medianya.
     else {
-      return SizedBox(width: double.infinity, child: placeholderWidget);
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: SizedBox(width: double.infinity, child: placeholderWidget),
+      );
     }
   }
 
@@ -99,58 +114,76 @@ class _MediaSelectorState extends State<MediaSelector> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(4),
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: colorScheme.outline),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            child: _mediaPlaceholder(), // <-- Fungsi yang kita buat tadi
+            // dipanggil di sini.
           ),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: _mediaPlaceholder(), // <-- Fungsi yang kita buat tadi
-                // dipanggil di sini.
-              ),
-              Container(
-                padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                color: Colors.blue[50],
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: FilledButton(
-                        child: Icon(Icons.photo_camera),
-                        onPressed: () {
-                          _selectFromCamera();
-                        },
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: FilledButton(
-                        child: Icon(Icons.photo_library),
-                        onPressed: () {
-                          _selectFromGallery();
-                        },
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: FilledButton(
-                        child: Icon(Icons.delete),
-                        onPressed: () {
-                          _deleteSelected();
-                        },
-                      ),
-                    ),
-                  ],
+          Divider(height: 1, thickness: 1, color: colorScheme.outlineVariant),
+          Container(
+            padding: const EdgeInsets.all(8),
+            color: colorScheme.surfaceContainerHighest,
+            child: Row(
+              children: [
+                Expanded(
+                  child: _mediaButton(
+                    icon: Icons.photo_camera_outlined,
+                    color: colorScheme.onSurfaceVariant,
+                    onPressed: _selectFromCamera,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _mediaButton(
+                    icon: Icons.photo_library_outlined,
+                    color: colorScheme.onSurfaceVariant,
+                    onPressed: _selectFromGallery,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _mediaButton(
+                    icon: Icons.delete_outline,
+                    color: colorScheme.error,
+                    onPressed: _deleteSelected,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+
+  // Tombol aksi (kamera, galeri, hapus) dengan gaya seragam.
+  Widget _mediaButton({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        backgroundColor: colorScheme.surface,
+        foregroundColor: color,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        side: BorderSide(color: colorScheme.outlineVariant),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      onPressed: onPressed,
+      child: Icon(icon),
     );
   }
 }

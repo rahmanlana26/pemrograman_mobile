@@ -113,22 +113,29 @@ class _BuatJurnalPageState extends State<BuatJurnalPage> {
                 'Tuliskan Dimensi Profil Pelajar Pancasila',
                 (text) => dimensiProfilPelajarPancasila = text,
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 16),
               Text('Foto Kegiatan'),
               SizedBox(height: 10),
               MediaSelector(), // <-- MediaSelector untuk foto.
-              SizedBox(height: 10),
+              SizedBox(height: 16),
               Text('Video Kegiatan'),
               SizedBox(height: 10),
               MediaSelector(
                 mediaType: MediaType.video,
               ), // <-- MediaSelector untuk video.
-              SizedBox(height: 10),
+              SizedBox(height: 16),
               SizedBox(
                 width: double.infinity, // Lebar SizedBox akan maksimal.
+                height: 50,
                 child: ElevatedButton(
                   // ElevatedButton sebagai child dari SizedBox.
                   // Lebarnya akan mengikuti lebar parent-nya.
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    textStyle: Theme.of(context).textTheme.titleMedium,
+                    shape: const StadiumBorder(),
+                  ),
                   onPressed: () => {_saveJurnal(context)},
                   child: Text('Simpan'),
                 ),

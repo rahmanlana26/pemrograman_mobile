@@ -16,70 +16,104 @@ class _AkunPageState extends State<AkunPage> {
   void _logout(BuildContext context) {
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(
-        builder: (context) => const LoginPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const LoginPage()),
       (route) => false,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: colorScheme.inversePrimary,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Ganti Sandi',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Divider(thickness: 2),
-            SizedBox(height: 10),
-            Text('Sandi Saat Ini'),
-            SizedBox(height: 10),
-            // -----------------
-            PasswordField(), // <-- Tambahkan di sini
-            // -----------------
-            SizedBox(height: 10),
-            Text('Sandi Baru'),
-            SizedBox(height: 10),
-            PasswordField(),
-            SizedBox(height: 10),
-            Text('Konfirmasi Sandi Baru'),
-            SizedBox(height: 10),
-            PasswordField(),
-            SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity, // <-- Lebar button akan maksimal.
-              child: ElevatedButton(
-                onPressed: () {},
-                child: Text('Simpan'),
+      body: SafeArea(
+        // SingleChildScrollView agar halaman tetap nyaman saat keyboard muncul.
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _sectionTitle(context, 'Ganti Sandi'),
+              const SizedBox(height: 4),
+              Divider(thickness: 1, color: colorScheme.outlineVariant),
+              const SizedBox(height: 16),
+              _fieldLabel(context, 'Sandi Saat Ini'),
+              const SizedBox(height: 8),
+              // -----------------
+              PasswordField(), // <-- Tambahkan di sini
+              // -----------------
+              const SizedBox(height: 16),
+              _fieldLabel(context, 'Sandi Baru'),
+              const SizedBox(height: 8),
+              PasswordField(),
+              const SizedBox(height: 16),
+              _fieldLabel(context, 'Konfirmasi Sandi Baru'),
+              const SizedBox(height: 8),
+              PasswordField(),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity, // <-- Lebar button akan maksimal.
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    textStyle: Theme.of(context).textTheme.titleMedium,
+                    shape: const StadiumBorder(),
+                  ),
+                  onPressed: () {},
+                  child: const Text('Simpan'),
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Keluar',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Divider(thickness: 2),
-            SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => {_logout(context)},
-                child: Text('Keluar dari Aplikasi'),
+              const SizedBox(height: 32),
+              _sectionTitle(context, 'Keluar'),
+              const SizedBox(height: 4),
+              Divider(thickness: 1, color: colorScheme.outlineVariant),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: colorScheme.error,
+                    side: BorderSide(color: colorScheme.error),
+                    textStyle: Theme.of(context).textTheme.titleMedium,
+                    shape: const StadiumBorder(),
+                  ),
+                  onPressed: () => {_logout(context)},
+                  child: const Text('Keluar dari Aplikasi'),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
-}
 
+  // Judul setiap bagian (Ganti Sandi, Keluar).
+  Widget _sectionTitle(BuildContext context, String text) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: Theme.of(context).colorScheme.primary,
+      ),
+    );
+  }
+
+  // Label di atas setiap field, dibuat rata kiri agar sejajar dengan field-nya.
+  Widget _fieldLabel(BuildContext context, String text) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+        fontWeight: FontWeight.w600,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+    );
+  }
+}
