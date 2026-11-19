@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mydj/components/password_field.dart';
+import 'package:mydj/data/login_info.dart';
 import 'package:mydj/pages/login_page.dart';
 
 class AkunPage extends StatefulWidget {
@@ -12,8 +13,20 @@ class AkunPage extends StatefulWidget {
 }
 
 class _AkunPageState extends State<AkunPage> {
-  // Keluar dari aplikasi, kembali ke halaman login.
-  void _logout(BuildContext context) {
+  // Keluar dari aplikasi: hapus info sesi, lalu kembali ke halaman login.
+  Future<void> _logout(BuildContext context) async {
+    await LoginInfo.deleteFromSharedPreferences();
+
+    // Setelah operasi async, pastikan widget-nya masih ada sebelum memakai
+    // BuildContext.
+    if (!context.mounted) return;
+
+    _openLoginPage(context);
+  }
+
+  void _openLoginPage(BuildContext context) {
+    // Halaman-halaman yang butuh login dibersihkan dari stack, sehingga user
+    // tidak bisa kembali ke halaman akun lewat tombol back setelah logout.
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -84,7 +97,10 @@ class _AkunPageState extends State<AkunPage> {
                     textStyle: Theme.of(context).textTheme.titleMedium,
                     shape: const StadiumBorder(),
                   ),
-                  onPressed: () => {_logout(context)},
+                  // <-- Hapus sesi login, lalu buka halaman login.
+                  onPressed: () {
+                    _logout(context);
+                  },
                   child: const Text('Keluar dari Aplikasi'),
                 ),
               ),
