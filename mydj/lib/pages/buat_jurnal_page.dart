@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mydj/components/media_selector.dart';
 import 'package:mydj/data/data_provider.dart';
 import 'package:mydj/data/jurnal.dart';
 import 'package:provider/provider.dart';
@@ -112,6 +113,16 @@ class _BuatJurnalPageState extends State<BuatJurnalPage> {
                 'Tuliskan Dimensi Profil Pelajar Pancasila',
                 (text) => dimensiProfilPelajarPancasila = text,
               ),
+              SizedBox(height: 10),
+              Text('Foto Kegiatan'),
+              SizedBox(height: 10),
+              MediaSelector(), // <-- MediaSelector untuk foto.
+              SizedBox(height: 10),
+              Text('Video Kegiatan'),
+              SizedBox(height: 10),
+              MediaSelector(
+                mediaType: MediaType.video,
+              ), // <-- MediaSelector untuk video.
               SizedBox(height: 10),
               SizedBox(
                 width: double.infinity, // Lebar SizedBox akan maksimal.

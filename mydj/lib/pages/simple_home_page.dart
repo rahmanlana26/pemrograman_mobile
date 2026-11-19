@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mydj/pages/akun.dart';
 import 'package:mydj/pages/buat_jurnal_page.dart';
 import 'package:mydj/pages/lihat_jurnal_page.dart';
 
@@ -34,7 +35,7 @@ class _SimpleHomePageState extends State<SimpleHomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const LihatJurnalPage(title: 'Akun'),
+        builder: (context) => const AkunPage(title: 'Akun'),
       ),
     );
   }
