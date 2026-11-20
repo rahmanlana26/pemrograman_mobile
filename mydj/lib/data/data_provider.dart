@@ -21,6 +21,20 @@ class DataProvider extends ChangeNotifier {
     await muatJurnal();
   }
 
+  // UPDATE: perbarui jurnal yang sudah ada (bukan menambah baris baru), lalu
+  // muat ulang daftarnya supaya halaman detail dan daftar jurnal langsung
+  // menampilkan data terbaru.
+  Future<void> ubahJurnal(Jurnal jurnal) async {
+    final db = await DatabaseHelper.instance.database;
+    await db.update(
+      'jurnal',
+      jurnal.toMap(),
+      where: 'id = ?',
+      whereArgs: [jurnal.id],
+    );
+    await muatJurnal();
+  }
+
   // DELETE: hapus jurnal berdasarkan id, lalu muat ulang daftarnya
   Future<void> hapusJurnal(int id) async {
     final db = await DatabaseHelper.instance.database;

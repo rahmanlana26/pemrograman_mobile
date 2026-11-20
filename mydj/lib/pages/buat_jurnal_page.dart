@@ -5,9 +5,14 @@ import 'package:mydj/data/jurnal.dart';
 import 'package:provider/provider.dart';
 
 class BuatJurnalPage extends StatefulWidget {
-  const BuatJurnalPage({super.key, required this.title});
+  // `jurnal` bersifat opsional:
+  // - null   -> halaman ini dipakai untuk membuat jurnal baru.
+  // - terisi -> halaman ini dipakai untuk mengedit jurnal yang sudah ada,
+  //             sehingga semua field langsung terisi data jurnal tersebut.
+  const BuatJurnalPage({super.key, required this.title, this.jurnal});
 
   final String title;
+  final Jurnal? jurnal;
 
   @override
   State<BuatJurnalPage> createState() {
@@ -23,6 +28,63 @@ class _BuatJurnalPageState extends State<BuatJurnalPage> {
   String materiTopikPembelajaran = '';
   String kegiatanPembelajaran = '';
   String dimensiProfilPelajarPancasila = '';
+
+  // Controller dipakai agar field bisa langsung terisi (pre-fill) ketika
+  // halaman ini dibuka untuk mengedit jurnal yang sudah ada.
+  late final TextEditingController _kelasController;
+  late final TextEditingController _mapelController;
+  late final TextEditingController _tujuanPembelajaranController;
+  late final TextEditingController _materiTopikPembelajaranController;
+  late final TextEditingController _kegiatanPembelajaranController;
+  late final TextEditingController _dimensiProfilPelajarPancasilaController;
+
+  // true jika halaman ini dipakai untuk mengedit jurnal yang sudah tersimpan.
+  bool get _modeEdit => widget.jurnal != null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Ambil jurnal yang akan diedit (null jika sedang membuat jurnal baru).
+    final Jurnal? jurnal = widget.jurnal;
+
+    // Isi seluruh state dengan data jurnal yang sudah ada.
+    kelas = jurnal?.kelas ?? '';
+    mapel = jurnal?.mapel ?? '';
+    jamKe = jurnal?.jam ?? 0;
+    tujuanPembelajaran = jurnal?.tujuanPembelajaran ?? '';
+    materiTopikPembelajaran = jurnal?.materiTopikPembelajaran ?? '';
+    kegiatanPembelajaran = jurnal?.kegiatanPembelajaran ?? '';
+    dimensiProfilPelajarPancasila =
+        jurnal?.dimensiProfilPelajarPancasila ?? '';
+
+    // Isi field dengan nilai yang sama supaya tampil pre-fill.
+    _kelasController = TextEditingController(text: kelas);
+    _mapelController = TextEditingController(text: mapel);
+    _tujuanPembelajaranController = TextEditingController(
+      text: tujuanPembelajaran,
+    );
+    _materiTopikPembelajaranController = TextEditingController(
+      text: materiTopikPembelajaran,
+    );
+    _kegiatanPembelajaranController = TextEditingController(
+      text: kegiatanPembelajaran,
+    );
+    _dimensiProfilPelajarPancasilaController = TextEditingController(
+      text: dimensiProfilPelajarPancasila,
+    );
+  }
+
+  @override
+  void dispose() {
+    _kelasController.dispose();
+    _mapelController.dispose();
+    _tujuanPembelajaranController.dispose();
+    _materiTopikPembelajaranController.dispose();
+    _kegiatanPembelajaranController.dispose();
+    _dimensiProfilPelajarPancasilaController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +102,7 @@ class _BuatJurnalPageState extends State<BuatJurnalPage> {
               Text('Kelas:'),
               SizedBox(height: 10),
               TextField(
+                controller: _kelasController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Masukkan Kelas',
@@ -54,6 +117,7 @@ class _BuatJurnalPageState extends State<BuatJurnalPage> {
               Text('Nama Mapel'),
               SizedBox(height: 10),
               TextField(
+                controller: _mapelController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Masukkan Nama Mapel',
@@ -68,6 +132,10 @@ class _BuatJurnalPageState extends State<BuatJurnalPage> {
               Text('Jam ke-'),
               SizedBox(height: 10),
               DropdownButtonFormField<String>(
+                // Pre-fill pilihan jam ketika sedang mengedit jurnal.
+                initialValue: (jamKe >= 1 && jamKe <= 8)
+                    ? jamKe.toString()
+                    : null,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Pilih Jam',
@@ -93,24 +161,28 @@ class _BuatJurnalPageState extends State<BuatJurnalPage> {
               _textArea(
                 'Tujuan Pembelajaran',
                 'Masukkan Tujuan Pembelajaran',
+                _tujuanPembelajaranController,
                 (text) => tujuanPembelajaran = text,
               ),
               SizedBox(height: 10),
               _textArea(
                 'Materi/Topik Pembelajaran',
                 'Masukkan Materi/Topik Pembelajaran',
+                _materiTopikPembelajaranController,
                 (text) => materiTopikPembelajaran = text,
               ),
               SizedBox(height: 10),
               _textArea(
                 'Kegiatan Pembelajaran',
                 'Masukkan Kegiatan Pembelajaran',
+                _kegiatanPembelajaranController,
                 (text) => kegiatanPembelajaran = text,
               ),
               SizedBox(height: 10),
               _textArea(
                 'Dimensi Profil Pelajar Pancasila',
                 'Tuliskan Dimensi Profil Pelajar Pancasila',
+                _dimensiProfilPelajarPancasilaController,
                 (text) => dimensiProfilPelajarPancasila = text,
               ),
               SizedBox(height: 16),
@@ -150,7 +222,8 @@ class _BuatJurnalPageState extends State<BuatJurnalPage> {
   Widget _textArea(
     String label,
     String hint,
-    void Function(String text) onChanged, // <-- Parameter ke-3 berupa fungsi
+    TextEditingController controller, // <-- Controller agar bisa pre-fill
+    void Function(String text) onChanged, // <-- Parameter ke-4 berupa fungsi
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,6 +231,7 @@ class _BuatJurnalPageState extends State<BuatJurnalPage> {
         Text(label),
         SizedBox(height: 10),
         TextField(
+          controller: controller,
           decoration: InputDecoration(
             border: OutlineInputBorder(),
             labelText: hint,
@@ -171,7 +245,10 @@ class _BuatJurnalPageState extends State<BuatJurnalPage> {
   }
 
   Future<void> _saveJurnal(BuildContext context) async {
+    // Saat mengedit, `id` dan `createdAt` diambil dari jurnal lama supaya data
+    // yang tersimpan memperbarui baris yang sama (bukan membuat baris baru).
     Jurnal jurnal = Jurnal(
+      id: widget.jurnal?.id,
       kelas: kelas,
       mapel: mapel,
       jam: jamKe,
@@ -179,15 +256,35 @@ class _BuatJurnalPageState extends State<BuatJurnalPage> {
       materiTopikPembelajaran: materiTopikPembelajaran,
       kegiatanPembelajaran: kegiatanPembelajaran,
       dimensiProfilPelajarPancasila: dimensiProfilPelajarPancasila,
+      createdAt: widget.jurnal?.createdAt,
     );
     DataProvider provider = context.read<DataProvider>();
-    // Simpan ke SQLite lewat Provider
-    await provider.tambahJurnal(jurnal);
+    final bool modeEdit = _modeEdit;
+
+    if (modeEdit) {
+      // UPDATE: perbarui jurnal yang sudah ada.
+      await provider.ubahJurnal(jurnal);
+    } else {
+      // CREATE: simpan jurnal baru ke SQLite lewat Provider.
+      await provider.tambahJurnal(jurnal);
+    }
+
     // BuildContext dipakai setelah operasi async, jadi harus dicek dulu
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Jurnal berhasil disimpan')),
-      );
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          modeEdit
+              ? 'Perubahan jurnal berhasil disimpan'
+              : 'Jurnal berhasil disimpan',
+        ),
+      ),
+    );
+
+    // Setelah menyimpan perubahan, kembali ke halaman detail jurnal.
+    if (modeEdit) {
+      Navigator.pop(context);
     }
   }
 }
