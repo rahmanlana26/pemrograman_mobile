@@ -37,7 +37,7 @@ class DetailJurnalPage extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) =>
-            BuatJurnalPage(title: 'Edit Jurnal', jurnal: jurnal),
+            BuatJurnalPage(title: 'Edit Jurnal Ini', jurnal: jurnal),
       ),
     );
   }
@@ -93,7 +93,7 @@ class DetailJurnalPage extends StatelessWidget {
                     shape: const StadiumBorder(),
                   ),
                   onPressed: () => _bukaEdit(context, data),
-                  child: const Text('Edit Jurnal'),
+                  child: const Text('Edit Jurnal Ini'),
                 ),
               ),
             ],
