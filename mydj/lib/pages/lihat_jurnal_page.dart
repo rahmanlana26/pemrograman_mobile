@@ -16,6 +16,13 @@ class LihatJurnalPage extends StatefulWidget {
 
 class _LihatJurnalPageState extends State<LihatJurnalPage> {
   @override
+  void initState() {
+    super.initState();
+    // Muat jurnal dari SQLite sekali saja saat halaman dibuka
+    context.read<DataProvider>().muatJurnal();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final List<Jurnal> daftarJurnal =
         context.watch<DataProvider>().jurnalTersimpan;
@@ -33,8 +40,18 @@ class _LihatJurnalPageState extends State<LihatJurnalPage> {
               child: ListView.separated(
                 itemBuilder: (context, index) => ListTile(
                   title: Text(daftarJurnal[index].kelas),
-                  subtitle: Text(daftarJurnal[index].mapel),
-                  trailing: Text(daftarJurnal[index].createdAt.toString()),
+                  subtitle: Text(
+                    '${daftarJurnal[index].mapel}\n${daftarJurnal[index].createdAt}',
+                  ),
+                  isThreeLine: true,
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      context
+                          .read<DataProvider>()
+                          .hapusJurnal(daftarJurnal[index].id!);
+                    },
+                  ),
                   onTap: () {},
                 ),
                 separatorBuilder: (context, index) => const Divider(),
